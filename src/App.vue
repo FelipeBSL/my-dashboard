@@ -1,85 +1,83 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
+  <div class="bg-gradient"></div>
+  <div class="bokeh bokeh-1"></div>
+  <div class="bokeh bokeh-2"></div>
+  <div class="bokeh bokeh-3"></div>
 
   <RouterView />
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+/* Slow-moving gradient background */
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(120deg, #0b0e17, #141a2e, #1a1030, #0e1a2b);
+  background-size: 400% 400%;
+  animation: gradientShift 30s ease infinite;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
   }
-
-  .logo {
-    margin: 0 2rem 0 0;
+  50% {
+    background-position: 100% 50%;
   }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
+  100% {
+    background-position: 0% 50%;
   }
+}
 
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
+/* Bokeh shapes */
+.bokeh {
+  position: fixed;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  pointer-events: none;
+}
 
-    padding: 1rem 0;
-    margin-top: 1rem;
+.bokeh-1 {
+  width: 420px;
+  height: 420px;
+  top: -100px;
+  left: -80px;
+  background: radial-gradient(circle, #6366f1, transparent 70%);
+  animation: floatSlow 22s ease-in-out infinite;
+}
+
+.bokeh-2 {
+  width: 320px;
+  height: 320px;
+  top: 40%;
+  right: -60px;
+  background: radial-gradient(circle, #22d3ee, transparent 70%);
+  animation: floatSlow 26s ease-in-out infinite reverse;
+}
+
+.bokeh-3 {
+  width: 280px;
+  height: 280px;
+  bottom: -80px;
+  left: 30%;
+  background: radial-gradient(circle, #f472b6, transparent 70%);
+  animation: floatSlow 34s ease-in-out infinite;
+}
+
+@keyframes floatSlow {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(40px, -30px) scale(1.08);
   }
 }
 </style>
