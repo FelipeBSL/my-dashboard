@@ -1,23 +1,52 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+
 import MetricCard from '@/components/MetricCard.vue'
+import metricsData from '@/data/metrics.json'
 
 interface Region {
   name: string
-  onTimePct: number
+  shipmentVolume: number
+  onTimeDeliveryPct: number
+  openExceptions: number
+  shipmentTrend: number
+  onTimeTrend: number
+  exceptionsTrend: number
 }
 
-// Placeholder dataset — will be replaced by src/data/metrics.json in Step 2.4
-const metrics = {
-  shipmentVolume: 48231,
-  onTimeDeliveryPct: 94.7,
-  openExceptions: 27,
-  regions: [
-    { name: 'Northeast', onTimePct: 92 },
-    { name: 'Midwest', onTimePct: 88 },
-    { name: 'South', onTimePct: 81 },
-    { name: 'West', onTimePct: 95 },
-  ] as Region[],
+interface TrendPoint {
+  month: string
+  shipments: number
 }
+
+const overview = {
+  ...metricsData.overview,
+  name: 'All Regions',
+}
+const regions = metricsData.regions as Region[]
+const selectedRegion = ref('All Regions')
+
+const regionOptions = ['All Regions', ...regions.map((region) => region.name)]
+
+const selectedMetrics = computed(() => {
+  if (selectedRegion.value === 'All Regions') return overview
+
+  return regions.find((region) => region.name === selectedRegion.value) ?? overview
+})
+
+const visibleRegions = computed(() => {
+  if (selectedRegion.value === 'All Regions') return regions
+
+  return regions.filter((region) => region.name === selectedRegion.value)
+})
+
+const trendPoints = computed(
+  () =>
+    (metricsData.monthlyTrends[selectedRegion.value as keyof typeof metricsData.monthlyTrends] ??
+      metricsData.monthlyTrends['All Regions']) as TrendPoint[],
+)
+
+const trendMax = computed(() => Math.max(...trendPoints.value.map((point) => point.shipments)))
 </script>
 
 <template>
@@ -36,13 +65,24 @@ const metrics = {
 
     <v-main>
       <v-container class="dashboard-main">
-        <h2 class="section-title">Key Metrics</h2>
+        <div class="section-heading">
+          <h2 class="section-title">Key Metrics</h2>
+          <v-select
+            v-model="selectedRegion"
+            class="region-filter"
+            label="View region"
+            :items="regionOptions"
+            variant="outlined"
+            density="comfortable"
+            hide-details
+          />
+        </div>
         <v-row class="metrics-grid">
           <v-col cols="12" sm="6" lg="3">
             <MetricCard
               label="Shipment Volume"
-              :value="metrics.shipmentVolume.toLocaleString()"
-              trend="6.2%"
+              :value="selectedMetrics.shipmentVolume.toLocaleString()"
+              :trend="`${selectedMetrics.shipmentTrend}%`"
               direction="up"
               icon="mdi-truck-outline"
             />
@@ -50,17 +90,17 @@ const metrics = {
           <v-col cols="12" sm="6" lg="3">
             <MetricCard
               label="On-Time Delivery"
-              :value="`${metrics.onTimeDeliveryPct}%`"
-              trend="1.3%"
-              direction="up"
+              :value="`${selectedMetrics.onTimeDeliveryPct}%`"
+              :trend="`${selectedMetrics.onTimeTrend}%`"
+              :direction="selectedMetrics.onTimeTrend >= 0 ? 'up' : 'down'"
               icon="mdi-clock-check-outline"
             />
           </v-col>
           <v-col cols="12" sm="6" lg="3">
             <MetricCard
               label="Open Exceptions"
-              :value="metrics.openExceptions"
-              trend="4"
+              :value="selectedMetrics.openExceptions"
+              :trend="`${selectedMetrics.exceptionsTrend}`"
               direction="down"
               icon="mdi-alert-outline"
             />
@@ -74,21 +114,35 @@ const metrics = {
           </div>
         </div>
         <div class="region-list">
-          <div class="region-row" v-for="region in metrics.regions" :key="region.name">
+          <div class="region-row" v-for="region in visibleRegions" :key="region.name">
             <span class="region-name">{{ region.name }}</span>
             <div class="region-bar-track">
-              <div class="region-bar-fill" :style="{ width: region.onTimePct + '%' }"></div>
-            </div>
-            <span class="region-value">{{ region.onTimePct }}%</span>
+              <div class="region-bar-fill" :style="{ width: region.onTimeDeliveryPct + '%' }"></div>
+              </div>
+              <span class="region-value">{{ region.onTimeDeliveryPct }}%</span>
           </div>
         </div>
             </v-card>
           </v-col>
         </v-row>
 
-        <h2 class="section-title">Trends</h2>
+        <div class="section-heading trends-heading">
+          <h2 class="section-title">Trends</h2>
+          <span class="filter-caption">{{ selectedRegion }} · monthly shipment volume</span>
+        </div>
         <v-card class="chart-section" elevation="0">
-          <div class="chart-placeholder">Chart section — coming soon</div>
+          <div class="trend-chart" role="img" :aria-label="`Monthly shipment volume for ${selectedRegion}`">
+            <div v-for="point in trendPoints" :key="point.month" class="trend-column">
+              <span class="trend-value">{{ point.shipments.toLocaleString() }}</span>
+              <div class="trend-bar-track">
+                <div
+                  class="trend-bar-fill"
+                  :style="{ height: `${(point.shipments / trendMax) * 100}%` }"
+                ></div>
+              </div>
+              <span class="trend-month">{{ point.month }}</span>
+            </div>
+          </div>
         </v-card>
       </v-container>
     </v-main>
@@ -149,6 +203,18 @@ const metrics = {
   text-transform: uppercase;
   color: var(--text-secondary);
   margin: 0 0 20px 4px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.region-filter {
+  max-width: 220px;
+  margin-top: -12px;
 }
 
 .metrics-grid {
@@ -283,11 +349,64 @@ const metrics = {
   justify-content: center;
 }
 
-.chart-placeholder {
-  font-weight: 200;
+.trends-heading {
+  align-items: baseline;
+}
+
+.filter-caption {
   color: var(--text-secondary);
-  font-size: 0.9rem;
-  letter-spacing: 0.5px;
+  font-size: 0.8rem;
+  font-weight: 200;
+}
+
+.trend-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 20px;
+  width: 100%;
+  min-height: 280px;
+  padding: 24px 12px 0;
+}
+
+.trend-column {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  height: 240px;
+}
+
+.trend-value {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 300;
+  white-space: nowrap;
+}
+
+.trend-bar-track {
+  display: flex;
+  align-items: flex-end;
+  width: min(64px, 100%);
+  flex: 1;
+  overflow: hidden;
+  border-radius: 8px 8px 2px 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.trend-bar-fill {
+  width: 100%;
+  min-height: 10px;
+  border-radius: 8px 8px 2px 2px;
+  background: linear-gradient(180deg, #22d3ee, #6366f1);
+  transition: height 0.3s ease;
+}
+
+.trend-month {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 300;
 }
 
 footer {
@@ -301,7 +420,7 @@ footer {
 }
 
 @media (max-width: 640px) {
-  header {
+  .dashboard-bar {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
@@ -313,6 +432,21 @@ footer {
 
   .dashboard-main {
     padding: 24px;
+  }
+
+  .section-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .region-filter {
+    max-width: none;
+    margin: 0 0 12px;
+  }
+
+  .trends-heading {
+    align-items: flex-start;
   }
 }
 </style>

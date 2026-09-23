@@ -1,0 +1,86 @@
+{
+  "lastUpdated": "September 14, 2026",
+  "overview": {
+    "shipmentVolume": 48231,
+    "onTimeDeliveryPct": 94.7,
+    "openExceptions": 27,
+    "shipmentTrend": 6.2,
+    "onTimeTrend": 1.3,
+    "exceptionsTrend": 4
+  },
+  "regions": [
+    {
+      "name": "Northeast",
+      "shipmentVolume": 13240,
+      "onTimeDeliveryPct": 92,
+      "openExceptions": 8,
+      "shipmentTrend": 4.8,
+      "onTimeTrend": 0.8,
+      "exceptionsTrend": 2
+    },
+    {
+      "name": "Midwest",
+      "shipmentVolume": 10860,
+      "onTimeDeliveryPct": 88,
+      "openExceptions": 9,
+      "shipmentTrend": 2.1,
+      "onTimeTrend": -0.6,
+      "exceptionsTrend": 1
+    },
+    {
+      "name": "South",
+      "shipmentVolume": 14590,
+      "onTimeDeliveryPct": 81,
+      "openExceptions": 7,
+      "shipmentTrend": 8.4,
+      "onTimeTrend": 1.9,
+      "exceptionsTrend": 3
+    },
+    {
+      "name": "West",
+      "shipmentVolume": 9541,
+      "onTimeDeliveryPct": 95,
+      "openExceptions": 3,
+      "shipmentTrend": 5.6,
+      "onTimeTrend": 2.4,
+      "exceptionsTrend": 2
+    }
+  ],
+  "monthlyTrends": {
+    "All Regions": [
+      { "month": "Apr", "shipments": 40120 },
+      { "month": "May", "shipments": 42380 },
+      { "month": "Jun", "shipments": 43890 },
+      { "month": "Jul", "shipments": 45110 },
+      { "month": "Aug", "shipments": 48231 }
+    ],
+    "Northeast": [
+      { "month": "Apr", "shipments": 11120 },
+      { "month": "May", "shipments": 11640 },
+      { "month": "Jun", "shipments": 12010 },
+      { "month": "Jul", "shipments": 12580 },
+      { "month": "Aug", "shipments": 13240 }
+    ],
+    "Midwest": [
+      { "month": "Apr", "shipments": 9840 },
+      { "month": "May", "shipments": 10120 },
+      { "month": "Jun", "shipments": 10460 },
+      { "month": "Jul", "shipments": 10640 },
+      { "month": "Aug", "shipments": 10860 }
+    ],
+    "South": [
+      { "month": "Apr", "shipments": 11900 },
+      { "month": "May", "shipments": 12840 },
+      { "month": "Jun", "shipments": 13220 },
+      { "month": "Jul", "shipments": 13780 },
+      { "month": "Aug", "shipments": 14590 }
+    ],
+    "West": [
+      { "month": "Apr", "shipments": 7260 },
+      { "month": "May", "shipments": 7780 },
+      { "month": "Jun", "shipments": 8200 },
+      { "month": "Jul", "shipments": 8110 },
+      { "month": "Aug", "shipments": 9541 }
+    ]
+  }
+}
